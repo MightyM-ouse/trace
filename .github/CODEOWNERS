@@ -1,0 +1,5 @@
+# Code owners for TRACE. Replace the placeholder with your GitHub handle/org.
+# This pairs with branch protection on `main` to operationalize TRACE's
+# human-approval gate (the "E" — Evidence/approval — in TRACE).
+
+# * @your-github-username

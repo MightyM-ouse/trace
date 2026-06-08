@@ -1,0 +1,11 @@
+{
+  "name": "trace-app",
+  "description": "An AI-assisted application built with the TRACE methodology",
+  "roles": ["Planner", "Builder", "Validator"],
+  "tech_stack": {
+    "backend": "FastAPI (Python 3.11+)",
+    "frontend": "React + Vite + Tailwind",
+    "telemetry_store": "SQLite (local) + GitHub for evidence"
+  },
+  "initialized_at": null
+}

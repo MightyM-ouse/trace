@@ -1,0 +1,18 @@
+{
+  "description": "Role -> Claude Code permission rules. v1: ADVISORY (documented intent; the single persona session enforces only the universal safety rules in .claude/settings.json). v2: each profile is applied to a real subagent's `permissions` block for runtime enforcement.",
+  "enforcement": { "v1": "advisory", "v2": "runtime (per-subagent permissions)" },
+  "profiles": {
+    "planner": {
+      "allow": ["Read(**)", "Write(docs/**)", "Edit(docs/**)", "Edit(PROJECT_STATUS_AND_NEXT_STEPS.md)"],
+      "deny": ["Edit(src/**)", "Write(src/**)", "Bash(npm run*)", "Bash(python*)"]
+    },
+    "builder": {
+      "allow": ["Read(**)", "Edit(src/**)", "Write(src/**)", "Edit(tests/**)", "Write(tests/**)", "Bash(*)"],
+      "deny": ["Edit(TECH_STACK.md)", "Write(TECH_STACK.md)", "Edit(.claude/**)", "Bash(git commit*)", "Bash(git push*)"]
+    },
+    "validator": {
+      "allow": ["Read(**)", "Bash(pytest*)", "Bash(npm test*)", "Bash(npx eslint*)", "Write(review-packages/**)"],
+      "deny": ["Edit(src/**)", "Write(src/**)", "Bash(git commit*)", "Bash(git push*)"]
+    }
+  }
+}

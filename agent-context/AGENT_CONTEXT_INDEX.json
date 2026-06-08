@@ -1,0 +1,50 @@
+{
+  "description": "Context routing index. Each role is given ONLY the files it needs (Route phase). In v1 these boundaries are advisory (the agent is instructed to respect them via CLAUDE.md). In v2 they are enforced by real subagent permissions.",
+  "version": 1,
+  "roles": {
+    "planner": {
+      "focus": "Architecture & design",
+      "access": "read-only codebase; write to docs/",
+      "allowed_files": [
+        "CLAUDE.md",
+        "PROJECT_ARCHITECTURE.md",
+        "TECH_STACK.md",
+        "REPOSITORY_INFO.md",
+        "PROJECT_STATUS_AND_NEXT_STEPS.md",
+        "docs/**",
+        "agent-context/**"
+      ],
+      "forbidden_files": ["src/**", "tests/**"],
+      "outputs": ["docs/adr/**", "PROJECT_STATUS_AND_NEXT_STEPS.md"],
+      "forbidden_actions": ["executing code", "mutating source files"]
+    },
+    "builder": {
+      "focus": "Implementation",
+      "access": "scoped write access to src/ and tests/",
+      "allowed_files": [
+        "CLAUDE.md",
+        "TECH_STACK.md",
+        "PROJECT_ARCHITECTURE.md",
+        "src/**",
+        "tests/**",
+        "agent-context/AGENT_CONTEXT_INDEX.json"
+      ],
+      "forbidden_files": ["TECH_STACK.md_WRITE", ".claude/**"],
+      "outputs": ["src/**", "tests/**", "review-packages/**"],
+      "forbidden_actions": ["altering TECH_STACK.md", "editing .claude/ config", "self-approving commits"]
+    },
+    "validator": {
+      "focus": "Testing & evidence",
+      "access": "test-execution only",
+      "allowed_files": [
+        "CLAUDE.md",
+        "src/**",
+        "tests/**",
+        "review-packages/**"
+      ],
+      "forbidden_files": ["TECH_STACK.md", "PROJECT_ARCHITECTURE.md"],
+      "outputs": ["review-packages/**", "validation reports"],
+      "forbidden_actions": ["writing feature code", "self-approving commits"]
+    }
+  }
+}

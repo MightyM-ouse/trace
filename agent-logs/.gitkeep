@@ -1,0 +1,2 @@
+# Keeps agent-logs/ in version control. Telemetry files here (trace.db, events.jsonl,
+# context.json) are git-ignored — only this placeholder is tracked.

@@ -1,0 +1,29 @@
+{
+  "name": "trace",
+  "version": "1.0.0-alpha.1",
+  "private": false,
+  "description": "Open-source AI agent orchestration template and observability tool — Template, Route, Assign, Check, Evidence.",
+  "license": "MIT",
+  "author": "Vinay <vl.vinay2@gmail.com>",
+  "keywords": [
+    "ai-agents",
+    "orchestration",
+    "observability",
+    "claude-code",
+    "context-engineering",
+    "telemetry",
+    "developer-tools"
+  ],
+  "scripts": {
+    "init": "bash scripts/setup.sh",
+    "dev": "make dev",
+    "server": "make server",
+    "ui": "make ui",
+    "install:all": "make install",
+    "test": "make test",
+    "lint": "make lint"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
