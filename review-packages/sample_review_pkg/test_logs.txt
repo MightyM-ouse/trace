@@ -1,0 +1,6 @@
+$ python3 -m pytest -q
+.....                                                                     [100%]
+5 passed in 0.16s
+
+$ ruff check src/server tests
+All checks passed!

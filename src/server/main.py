@@ -10,6 +10,7 @@ Binds to 127.0.0.1 only. Optional shared-secret via TRACE_INGEST_TOKEN.
 """
 import asyncio
 import json
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -20,6 +21,8 @@ from fastapi.responses import StreamingResponse
 import db
 import ingest
 from paths import context_path, review_packages_dir
+
+logger = logging.getLogger("trace.server")
 
 INGEST_TOKEN = os.environ.get("TRACE_INGEST_TOKEN", "")
 POLL_SECONDS = float(os.environ.get("TRACE_POLL_SECONDS", "3"))
@@ -48,7 +51,8 @@ async def _background_poll() -> None:
         try:
             await _ingest_and_broadcast()
         except Exception:
-            pass
+            # Don't crash the loop, but don't swallow silently either.
+            logger.exception("background ingest poll failed")
         await asyncio.sleep(POLL_SECONDS)
 
 
@@ -78,7 +82,7 @@ def _read_context() -> dict:
     if p.exists():
         try:
             return json.loads(p.read_text(encoding="utf-8"))
-        except Exception:
+        except (json.JSONDecodeError, OSError):
             return {}
     return {}
 
@@ -157,7 +161,7 @@ async def stream() -> StreamingResponse:
                 try:
                     rec = await asyncio.wait_for(q.get(), timeout=20.0)
                     yield f"data: {json.dumps(rec)}\n\n"
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     yield ": keep-alive\n\n"  # SSE comment, keeps connection open
         finally:
             _subscribers.discard(q)

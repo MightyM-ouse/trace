@@ -52,7 +52,8 @@ TRACE is deliberate about what is **measured** vs **estimated**:
 | Role personas + permission-rule boundaries | **CURRENT** |
 | FastAPI telemetry server (SQLite + SSE) | **CURRENT** |
 | React dashboard: live timeline, durations, context-rot gauge, evidence browser | **CURRENT** |
-| Approximate token/cost ROI via OpenTelemetry | **CURRENT** |
+| Approximate ROI panel (subagent tokens + status-line cost snapshot) | **CURRENT** |
+| OpenTelemetry token/cost integration (accurate session totals) | **PLANNED (v1.1)** |
 | Interactive `npm run init` setup wizard | **CURRENT** |
 | Real subagents with per-agent token telemetry | **PLANNED (v2)** |
 | Cross-session analytics & baseline-vs-TRACE comparison | **PLANNED (v2)** |
@@ -73,6 +74,17 @@ make dev
 ```
 
 Open http://localhost:5173 for the dashboard. See [`docs/`](./docs) for the architecture deep-dive, [`ARCHITECTURE_REVIEW.md`](./ARCHITECTURE_REVIEW.md) for the design rationale, and [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md) for the v1/v2 roadmap.
+
+Requires **Python 3.11+** and **Node 20+**. Hit a dependency snag? See [`docs/troubleshooting.md`](./docs/troubleshooting.md).
+
+## Known limitations (v1)
+
+TRACE v1 is deliberately scoped. Being honest about the edges:
+
+- **Roles are advisory, not runtime-enforced.** Planner/Builder/Validator boundaries are conventions enforced by `CLAUDE.md` instructions and a small set of *universal* safety deny-rules in `.claude/settings.json`. Per-role permission enforcement arrives with real subagents in **v2**.
+- **Token/cost ROI is approximate and whole-session.** Per-agent token attribution requires v2 subagents; accurate session totals require the OpenTelemetry integration (planned v1.1). The dashboard labels these numbers **approx**.
+- **Single-user, local-first.** No auth, no multi-user aggregation; the server binds to `127.0.0.1`. Team telemetry is **v2**.
+- **What's always real:** git diffs, review-packages, status-file updates, and the per-tool intent/duration timeline. Evidence is never estimated.
 
 ## Security & trust model
 

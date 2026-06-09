@@ -1,0 +1,15 @@
+{
+  "package": "sample_review_pkg",
+  "sample": true,
+  "task": "Add /api/health liveness endpoint",
+  "role": "Validator",
+  "tests": { "passed": 5, "failed": 0, "framework": "pytest" },
+  "lint": { "tool": "ruff", "status": "passed" },
+  "scope_check": {
+    "files_changed": ["src/server/main.py", "tests/test_server.py"],
+    "outside_allowed_scope": false
+  },
+  "risks": [],
+  "recommendation": "approve",
+  "note": "Illustrative evidence package demonstrating the required format; not a record of a real change."
+}

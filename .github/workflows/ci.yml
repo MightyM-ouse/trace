@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r src/server/requirements.txt ruff
       - name: Lint
-        run: ruff check src/server || true
+        run: ruff check src/server tests
       - name: Test
         run: python -m pytest -q
 
@@ -34,8 +34,9 @@ jobs:
         with:
           node-version: "20"
       - name: Install dependencies
-        run: npm ci || npm install
+        # Fresh install avoids cross-platform Rollup optional-dependency skew.
+        run: npm install --no-audit --no-fund
       - name: Lint
-        run: npm run lint || true
+        run: npm run lint
       - name: Build
         run: npm run build

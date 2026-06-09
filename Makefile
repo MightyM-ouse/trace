@@ -30,12 +30,12 @@ dev:
 	  cd src/ui && npm run dev
 
 test:
-	cd src/server && python3 -m pytest -q || true
-	cd src/ui && npm test --silent || true
+	python3 -m pytest -q
+	cd src/ui && npm test --silent
 
 lint:
-	cd src/server && ruff check . || true
-	cd src/ui && npx eslint src || true
+	ruff check src/server tests
+	cd src/ui && npx eslint src
 
 clean:
 	rm -f agent-logs/*.db agent-logs/*.db-wal agent-logs/*.db-shm agent-logs/*.jsonl

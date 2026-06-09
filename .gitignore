@@ -27,6 +27,9 @@ dist/
 *.local
 vite.config.js.timestamp-*.mjs
 vite.config.*.timestamp-*
+# Not committed: a lockfile generated on one OS can omit native Rollup binaries
+# for another (npm/cli#4828). Each platform resolves its own on `npm install`.
+package-lock.json
 
 # ---- Env & secrets ----
 .env

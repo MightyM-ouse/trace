@@ -3,7 +3,6 @@
 Run from repo root: `python3 -m pytest -q` (after `pip install -r src/server/requirements.txt`).
 """
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -85,3 +84,49 @@ def test_hook_post_is_idempotent(app_client):
 
 def test_health(app_client):
     assert app_client.get("/api/health").json()["status"] == "ok"
+
+
+def test_sse_broadcast_fanout(app_client):
+    # Proves the SSE fan-out: a broadcast reaches a subscribed queue. (We test the
+    # mechanism directly rather than an HTTP stream, which would block on an open
+    # connection.)
+    import asyncio
+
+    import main
+
+    async def run():
+        q: asyncio.Queue = asyncio.Queue()
+        main._subscribers.add(q)
+        try:
+            main._broadcast([{"event": "PostToolUse", "tool_name": "Bash"}])
+            return await asyncio.wait_for(q.get(), timeout=1.0)
+        finally:
+            main._subscribers.discard(q)
+
+    rec = asyncio.run(run())
+    assert rec["tool_name"] == "Bash"
+
+
+def test_ingest_ignores_partial_trailing_line(tmp_path, monkeypatch):
+    # A half-written final line must not be consumed until it's complete.
+    monkeypatch.setenv("TRACE_PROJECT_DIR", str(tmp_path))
+    logs = tmp_path / "agent-logs"
+    logs.mkdir()
+    jsonl = logs / "events.jsonl"
+    jsonl.write_text(
+        json.dumps({"event": "UserPromptSubmit"}) + "\n" + '{"event": "PostToolU'  # truncated
+    )
+    for mod in ("ingest", "db", "paths"):
+        sys.modules.pop(mod, None)
+    import db as dbmod
+    import ingest as ingestmod
+
+    dbmod.init_db()
+    first = ingestmod.ingest_new()
+    assert len(first) == 1  # only the complete line
+    # Complete the line; next ingest picks it up exactly once.
+    with open(jsonl, "a", encoding="utf-8") as fh:
+        fh.write('se", "tool_name": "Bash"}\n')
+    second = ingestmod.ingest_new()
+    assert len(second) == 1
+    assert dbmod.counters()["total_events"] == 2

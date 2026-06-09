@@ -1,0 +1,25 @@
+diff --git a/src/server/main.py b/src/server/main.py
+--- a/src/server/main.py
++++ b/src/server/main.py
+@@ -90,6 +90,11 @@ def _read_context() -> dict:
+     return {}
+
+
++@app.get("/api/health")
++async def health() -> dict:
++    return {"status": "ok", "service": "trace-telemetry"}
++
++
+ @app.post("/api/telemetry/hook")
+ async def ingest_hook(request: Request, x_trace_token: str = Header(default="")) -> dict:
+     if INGEST_TOKEN and x_trace_token != INGEST_TOKEN:
+diff --git a/tests/test_server.py b/tests/test_server.py
+--- a/tests/test_server.py
++++ b/tests/test_server.py
+@@ -80,3 +80,7 @@ def test_hook_post_is_idempotent(app_client):
+     after = app_client.get("/api/state").json()["counters"]["total_events"]
+     assert after == before
+
++
++def test_health(app_client):
++    assert app_client.get("/api/health").json()["status"] == "ok"

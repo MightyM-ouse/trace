@@ -12,6 +12,10 @@ Maintainer: Vinay
 - [x] FastAPI telemetry server (SQLite + SSE)
 - [x] React/Vite/Tailwind dashboard
 - [x] Interactive `setup.sh` wizard
+- [x] Pushed to GitHub (github.com/MightyM-ouse/trace)
+- [x] Credibility/hardening pass: honest CI/lint (no `|| true`), ruff config, eslint plugins,
+      newline-safe ingestion, Python-generated setup JSON, OTel marked PLANNED, Known Limitations,
+      troubleshooting + branch-protection docs, sample review-package, e2e tests (6/6 pass)
 
 ## Current Execution Summary
 v1 scaffold is in place: personas governed by `CLAUDE.md` + permission rules, real-evidence pipeline, approximate-ROI telemetry into SQLite, and a local dashboard.
