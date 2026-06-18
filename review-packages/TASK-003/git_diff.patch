@@ -1,0 +1,52 @@
+diff --git a/src/server/main.py b/src/server/main.py
+index c2b8a5b..d7c87f2 100644
+--- a/src/server/main.py
++++ b/src/server/main.py
+@@ -9,6 +9,7 @@ Transport model:
+ Binds to 127.0.0.1 only. Optional shared-secret via TRACE_INGEST_TOKEN.
+ """
+ import asyncio
++import hmac
+ import json
+ import logging
+ import os
+@@ -94,7 +95,9 @@ async def health() -> dict:
+ 
+ @app.post("/api/telemetry/hook")
+ async def ingest_hook(request: Request, x_trace_token: str = Header(default="")) -> dict:
+-    if INGEST_TOKEN and x_trace_token != INGEST_TOKEN:
++    if INGEST_TOKEN and not hmac.compare_digest(
++        x_trace_token.encode("utf-8"), INGEST_TOKEN.encode("utf-8")
++    ):
+         raise HTTPException(status_code=401, detail="bad ingest token")
+     # Body is only a wake-up; the JSONL log is the source of truth.
+     try:
+diff --git a/tests/test_server.py b/tests/test_server.py
+index 908ed2d..d4845bd 100644
+--- a/tests/test_server.py
++++ b/tests/test_server.py
+@@ -130,3 +130,24 @@ def test_ingest_ignores_partial_trailing_line(tmp_path, monkeypatch):
+     second = ingestmod.ingest_new()
+     assert len(second) == 1
+     assert dbmod.counters()["total_events"] == 2
++
++
++def test_ingest_hook_requires_correct_token(tmp_path, monkeypatch):
++    # With a token configured, a wrong token is rejected and the right one passes.
++    monkeypatch.setenv("TRACE_PROJECT_DIR", str(tmp_path))
++    monkeypatch.setenv("TRACE_INGEST_TOKEN", "s3cret")
++    (tmp_path / "agent-logs").mkdir()
++    for mod in ("main", "ingest", "db", "paths", "models"):
++        sys.modules.pop(mod, None)
++    import main
++    from fastapi.testclient import TestClient
++
++    with TestClient(main.app) as client:
++        bad = client.post(
++            "/api/telemetry/hook", headers={"x-trace-token": "wrong"}, json={}
++        )
++        assert bad.status_code == 401
++        good = client.post(
++            "/api/telemetry/hook", headers={"x-trace-token": "s3cret"}, json={}
++        )
++        assert good.status_code == 200

@@ -1,0 +1,12 @@
+{
+  "task_id": "TASK-003",
+  "intent": "Constant-time comparison for the ingest auth token (hmac.compare_digest)",
+  "verify_command": "ruff check src/server tests && python -m pytest -q",
+  "claim": {"tests": "pass", "lint": "clean"},
+  "reality": {"ruff_exit": 0, "pytest_exit": 0, "tests_passed_summary": "7 passed (6 existing + 1 new), exit 0"},
+  "claim_matches_reality": true,
+  "allowed_scope": ["src/server/main.py", "tests/test_server.py"],
+  "files_changed": ["src/server/main.py", "tests/test_server.py"],
+  "scope_violation": false,
+  "verdict": "GREEN"
+}
