@@ -130,3 +130,24 @@ def test_ingest_ignores_partial_trailing_line(tmp_path, monkeypatch):
     second = ingestmod.ingest_new()
     assert len(second) == 1
     assert dbmod.counters()["total_events"] == 2
+
+
+def test_ingest_hook_requires_correct_token(tmp_path, monkeypatch):
+    # With a token configured, a wrong token is rejected and the right one passes.
+    monkeypatch.setenv("TRACE_PROJECT_DIR", str(tmp_path))
+    monkeypatch.setenv("TRACE_INGEST_TOKEN", "s3cret")
+    (tmp_path / "agent-logs").mkdir()
+    for mod in ("main", "ingest", "db", "paths", "models"):
+        sys.modules.pop(mod, None)
+    import main
+    from fastapi.testclient import TestClient
+
+    with TestClient(main.app) as client:
+        bad = client.post(
+            "/api/telemetry/hook", headers={"x-trace-token": "wrong"}, json={}
+        )
+        assert bad.status_code == 401
+        good = client.post(
+            "/api/telemetry/hook", headers={"x-trace-token": "s3cret"}, json={}
+        )
+        assert good.status_code == 200
