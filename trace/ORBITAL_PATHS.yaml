@@ -1,0 +1,57 @@
+# ORBITAL_PATHS.yaml
+# State machine definition for TRACE Loop Engine
+
+workflow_id: governed_execution_v1
+states:
+  - task_intake
+  - classify_mode
+  - plan
+  - review_plan
+  - human_plan_approval
+  - implement
+  - validate
+  - verify
+  - final_review
+  - evidence_update
+  - human_close_approval
+  - closed
+transitions:
+  task_intake:
+    next: classify_mode
+  classify_mode:
+    if_investigation_needed: route_context
+    if_execution_ready: plan
+  plan:
+    role: architect
+    next: review_plan
+  review_plan:
+    role: reviewer
+    if_approved: human_plan_approval
+    if_rejected: plan
+  human_plan_approval:
+    required: true
+    next: implement
+  implement:
+    role: developer
+    next: validate
+  validate:
+    role: validator
+    checks: [lint, tests, build]
+    if_pass: verify
+    if_fail: implement
+    max_retries: 3
+  verify:
+    role: verifier
+    if_pass: final_review
+    if_fail: implement
+    max_retries: 2
+  final_review:
+    role: final_reviewer
+    if_approved: evidence_update
+    if_rejected: implement
+  evidence_update:
+    output: trace/evidence/{task_id}_light_curve.md
+    next: human_close_approval
+  human_close_approval:
+    required: true
+    next: closed
