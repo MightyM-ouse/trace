@@ -1,0 +1,52 @@
+# Template for auto‑research tasks
+
+# Fill in this YAML to define a new optimization loop.
+# The orchestrator will read this file and run the loop defined here.
+
+# Unique identifier for this optimization task
+# Change this to a meaningful ID such as TRACE-OPT-001
+#
+task_id: PLACEHOLDER
+
+# Mode must be `optimization` to trigger the auto‑research engine
+mode: optimization
+
+goal:
+  # Description of what to improve (e.g. "Codex prompt quality")
+  improve: ""
+  # Objective metric name (e.g. "test pass rate")
+  target_metric: ""
+
+# Instructions file that describes what the AI cannot change
+# Provide a path under trace/autoresearch/instructions/
+locked_instructions:
+  path: trace/autoresearch/instructions/PLACEHOLDER.md
+
+# List of files that the AI is allowed to modify
+editable_assets:
+  - trace/prompts/PLACEHOLDER.md
+
+# Scorer script that returns a numeric score when run
+# Provide a path under trace/autoresearch/scorers/
+scorer:
+  path: trace/autoresearch/scorers/PLACEHOLDER.py
+
+# Baseline score for comparison
+baseline:
+  current_score: 0.0
+
+# Rules for accepting a new variant
+success_rules:
+  keep_change_if:
+    score_improves_by_at_least: 0.01
+    no_required_check_fails: true
+    no_scope_violation: true
+
+# Loop controls
+loop:
+  # Maximum number of iterations to run
+  max_iterations: 20
+  # Maximum runtime in minutes before stopping
+  max_runtime_minutes: 60
+  # Whether a human must review the winner before committing it
+  require_human_review_before_merge: true
