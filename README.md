@@ -24,6 +24,17 @@ TRACE is two things:
 1. **A methodology + template** — a standardized repo structure and a set of agent rules (`CLAUDE.md`) that govern how an AI works in your project.
 2. **A live observability dashboard** — a local FastAPI + React app that shows, in real time, what the agent is doing, how long tools take, how close you are to a context-rot event, and an approximate token/cost ROI.
 
+## Architecture
+
+![TRACE architecture and flow](docs/architecture.png)
+
+Four planes that run together: the **governed execution loop** (control — the PR is the
+state machine), the **telemetry data plane** (observe — `events.jsonl` is the write-ahead
+truth, SQLite is an approximate projection), the **git & evidence plane** (what actually
+shipped, never estimated), and the **deferred auto-research extension**. Colors: red blocks,
+blue informs, violet = human gate, green = real/in-git, amber = approximate, dashed = not
+built yet. Full-resolution vector: [`docs/architecture.svg`](docs/architecture.svg).
+
 ## The TRACE algorithm
 
 | Phase | Meaning | What it produces |

@@ -1,0 +1,287 @@
+<svg viewBox="0 0 1480 1360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Inter, system-ui, sans-serif">
+<title>TRACE full architecture and flow</title>
+<desc>Four layers: actors, the governed execution loop (PR as state machine), the telemetry/observability data plane, the git/evidence plane, and the deferred auto-research extension, plus a legend of gate types.</desc>
+<style>
+  text{fill:#2c2c2a;}
+  .mono{font-family:ui-monospace, "SFMono-Regular", Menlo, monospace;}
+  .zone{fill:#888780;fill-opacity:0.05;stroke:#888780;stroke-opacity:.35;stroke-dasharray:4 4;}
+  .zlabel{font-size:15px;font-weight:700;}
+  .zsub{font-size:11px;fill:#5f5e5a;}
+  .node{fill:#ffffff;stroke:#888780;stroke-width:1.4;}
+  .gate{stroke:#E24B4A;stroke-width:2.2;}
+  .human{stroke:#7F77DD;stroke-width:2.2;}
+  .data{stroke:#1D9E75;stroke-width:1.8;}
+  .approx{stroke:#EF9F27;stroke-width:1.8;}
+  .advis{stroke:#378ADD;stroke-width:1.8;stroke-dasharray:5 3;}
+  .defer{stroke:#888780;stroke-width:1.6;stroke-dasharray:6 4;}
+  .nt{font-size:12px;font-weight:650;}
+  .ns{font-size:9.5px;fill:#5f5e5a;}
+  .tag{font-size:8.5px;font-weight:700;letter-spacing:.04em;}
+  .flow{stroke:#888780;stroke-width:1.6;fill:none;marker-end:url(#ag);}
+  .fred{stroke:#E24B4A;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ar);}
+  .fblue{stroke:#378ADD;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ab);}
+  .fgrn{stroke:#1D9E75;stroke-width:1.6;fill:none;marker-end:url(#agr);}
+  .fvio{stroke:#7F77DD;stroke-width:1.6;fill:none;marker-end:url(#av);}
+  .fdef{stroke:#888780;stroke-width:1.4;fill:none;stroke-dasharray:6 4;marker-end:url(#ag);}
+  .el{font-size:9px;fill:#5f5e5a;}
+</style>
+<defs>
+  <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#888780"/></marker>
+  <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#E24B4A"/></marker>
+  <marker id="ab" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#378ADD"/></marker>
+  <marker id="agr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1D9E75"/></marker>
+  <marker id="av" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7F77DD"/></marker>
+</defs>
+
+<rect x="0" y="0" width="1480" height="1360" fill="#ffffff"/>
+
+<text x="40" y="30" font-size="21" font-weight="700">TRACE — Full Architecture &amp; Flow</text>
+<text x="40" y="49" class="zsub">Template · Route · Assign · Check · Evidence — a governed loop (control) over a telemetry plane (observe) and a git plane (truth)</text>
+
+<rect class="zone" x="30" y="58" width="1420" height="84" rx="14"/>
+<text x="46" y="80" class="zlabel">A · Actors</text>
+<rect class="node" x="150" y="92" width="200" height="40" rx="8"/>
+<text x="250" y="110" text-anchor="middle" class="nt">Human Owner</text>
+<text x="250" y="124" text-anchor="middle" class="ns">approves the two gates</text>
+<rect class="node" x="380" y="92" width="300" height="40" rx="8"/>
+<text x="530" y="110" text-anchor="middle" class="nt">AI Workers — Claude · Codex · Antigravity</text>
+<text x="530" y="124" text-anchor="middle" class="ns">read AGENTS.md first · stay in role + scope</text>
+<rect class="node" x="710" y="92" width="250" height="40" rx="8"/>
+<text x="835" y="110" text-anchor="middle" class="nt">Roles: Planner · Builder · Validator</text>
+<text x="835" y="124" text-anchor="middle" class="ns">advisory in v1 · enforced in v2</text>
+<text x="1000" y="108" class="zsub">git is the source of truth —</text>
+<text x="1000" y="123" class="zsub">chat history is not.</text>
+
+<rect class="zone" x="30" y="156" width="1420" height="300" rx="14"/>
+<text x="46" y="178" class="zlabel">B · Governed execution loop</text>
+<text x="240" y="178" class="zsub">the Pull Request IS the state machine (trace/ORBITAL_PATHS.yaml)</text>
+
+<rect class="node" x="40" y="244" width="120" height="60" rx="8"/>
+<text x="100" y="270" text-anchor="middle" class="nt">Task intake</text>
+<text x="100" y="285" text-anchor="middle" class="ns">issue / CURRENT_TASK</text>
+<text x="100" y="297" text-anchor="middle" class="ns">scope + claim</text>
+<rect class="node" x="178" y="244" width="120" height="60" rx="8"/>
+<text x="238" y="270" text-anchor="middle" class="nt">Classify mode</text>
+<text x="238" y="285" text-anchor="middle" class="ns">investigate /</text>
+<text x="238" y="297" text-anchor="middle" class="ns">execute</text>
+<rect class="node" x="316" y="244" width="120" height="60" rx="8"/>
+<text x="376" y="270" text-anchor="middle" class="nt">Plan</text>
+<text x="376" y="285" text-anchor="middle" class="ns">Planner · scope</text>
+<text x="376" y="297" text-anchor="middle" class="ns">+ test command</text>
+<rect class="node human" x="454" y="244" width="120" height="60" rx="8"/>
+<text x="514" y="266" text-anchor="middle" class="nt" fill="#7F77DD">Plan approval</text>
+<text x="514" y="282" text-anchor="middle" class="tag" fill="#7F77DD">HUMAN GATE</text>
+<text x="514" y="297" text-anchor="middle" class="ns">no build unratified</text>
+<rect class="node" x="592" y="244" width="120" height="60" rx="8"/>
+<text x="652" y="270" text-anchor="middle" class="nt">Implement</text>
+<text x="652" y="285" text-anchor="middle" class="ns">Builder · feature/…</text>
+<text x="652" y="297" text-anchor="middle" class="ns">inside scope only</text>
+<rect class="node gate" x="730" y="244" width="120" height="60" rx="8"/>
+<text x="790" y="266" text-anchor="middle" class="nt" fill="#E24B4A">Validate</text>
+<text x="790" y="282" text-anchor="middle" class="tag" fill="#E24B4A">HARD GATE · CI</text>
+<text x="790" y="297" text-anchor="middle" class="ns">lint · tests · build</text>
+<rect class="node advis" x="868" y="244" width="120" height="60" rx="8"/>
+<text x="928" y="266" text-anchor="middle" class="nt" fill="#378ADD">Verify</text>
+<text x="928" y="282" text-anchor="middle" class="tag" fill="#378ADD">ADVISORY</text>
+<text x="928" y="297" text-anchor="middle" class="ns">AI review · claim=real</text>
+<rect class="node human" x="1006" y="244" width="120" height="60" rx="8"/>
+<text x="1066" y="266" text-anchor="middle" class="nt" fill="#7F77DD">Close approval</text>
+<text x="1066" y="282" text-anchor="middle" class="tag" fill="#7F77DD">HUMAN GATE</text>
+<text x="1066" y="297" text-anchor="middle" class="ns">approve the PR</text>
+<rect class="node data" x="1144" y="244" width="120" height="60" rx="8"/>
+<text x="1204" y="270" text-anchor="middle" class="nt" fill="#1D9E75">Evidence</text>
+<text x="1204" y="285" text-anchor="middle" class="ns">review-packages/</text>
+<text x="1204" y="297" text-anchor="middle" class="ns">diff · logs · report</text>
+<rect class="node data" x="1282" y="244" width="128" height="60" rx="8"/>
+<text x="1346" y="270" text-anchor="middle" class="nt" fill="#1D9E75">Closed</text>
+<text x="1346" y="285" text-anchor="middle" class="ns">merge → main</text>
+<text x="1346" y="297" text-anchor="middle" class="ns">loop complete</text>
+
+<path class="flow" d="M160,274 L176,274"/>
+<path class="flow" d="M298,274 L314,274"/>
+<path class="flow" d="M436,274 L452,274"/>
+<path class="fvio" d="M574,274 L590,274"/>
+<path class="flow" d="M712,274 L728,274"/>
+<path class="flow" d="M850,274 L866,274"/>
+<path class="fblue" d="M988,274 L1004,274"/>
+<path class="fvio" d="M1126,274 L1142,274"/>
+<path class="fgrn" d="M1264,274 L1280,274"/>
+
+<path class="fred" d="M740,304 C700,348 660,348 654,306"/>
+<text x="666" y="342" class="el" fill="#E24B4A">fail · retry ≤3</text>
+<path class="fblue" d="M876,304 C760,372 660,372 652,306"/>
+<text x="740" y="368" class="el" fill="#378ADD">fail · retry ≤2</text>
+<path class="fred" d="M462,304 C420,338 392,338 382,306"/>
+<text x="388" y="334" class="el" fill="#E24B4A">rework</text>
+<rect class="node gate" x="905" y="392" width="170" height="44" rx="8"/>
+<text x="990" y="412" text-anchor="middle" class="nt" fill="#E24B4A">needs_human (terminal)</text>
+<text x="990" y="426" text-anchor="middle" class="ns">retries exhausted → stop + label</text>
+<path class="fred" d="M800,304 C820,360 900,372 940,390"/>
+<path class="fblue" d="M935,304 C980,350 995,366 995,390"/>
+
+<rect class="zone" x="30" y="470" width="1420" height="324" rx="14"/>
+<text x="46" y="492" class="zlabel">C · Telemetry / observability data plane</text>
+<text x="430" y="492" class="zsub">non-blocking · JSONL is the write-ahead truth · SQLite is a queryable projection</text>
+
+<rect class="node" x="40" y="520" width="120" height="58" rx="8"/>
+<text x="100" y="545" text-anchor="middle" class="nt">Tool call</text>
+<text x="100" y="560" text-anchor="middle" class="ns">in Build / Validate</text>
+<rect class="node" x="186" y="520" width="156" height="58" rx="8"/>
+<text x="264" y="542" text-anchor="middle" class="nt">Claude Code hooks</text>
+<text x="264" y="557" text-anchor="middle" class="ns">Pre/PostToolUse · Failure</text>
+<text x="264" y="569" text-anchor="middle" class="ns">UserPrompt · PreCompact · Stop</text>
+<rect class="node" x="368" y="520" width="140" height="58" rx="8"/>
+<text x="438" y="545" text-anchor="middle" class="nt mono">trace_hook.py</text>
+<text x="438" y="560" text-anchor="middle" class="ns">capture intent + result</text>
+<rect class="node data" x="534" y="520" width="156" height="58" rx="8"/>
+<text x="612" y="542" text-anchor="middle" class="nt mono" fill="#1D9E75">events.jsonl</text>
+<text x="612" y="557" text-anchor="middle" class="ns">WAL · durable · append-only</text>
+<text x="612" y="569" text-anchor="middle" class="ns">survives server downtime</text>
+<rect class="node" x="716" y="520" width="190" height="58" rx="8"/>
+<text x="811" y="542" text-anchor="middle" class="nt mono">POST :8000 /telemetry/hook</text>
+<text x="811" y="557" text-anchor="middle" class="ns">wake-up only · token auth</text>
+<text x="811" y="569" text-anchor="middle" class="ns">binds 127.0.0.1</text>
+
+<path class="flow" d="M160,549 L184,549"/>
+<path class="flow" d="M342,549 L366,549"/>
+<path class="fgrn" d="M508,549 L532,549"/>
+<path class="flow" d="M508,562 C600,600 660,590 716,560"/>
+<text x="556" y="596" class="el">+ notify</text>
+
+<rect class="node" x="40" y="700" width="150" height="58" rx="8"/>
+<text x="115" y="722" text-anchor="middle" class="nt mono">statusline.py</text>
+<text x="115" y="737" text-anchor="middle" class="ns">→ context.json</text>
+<text x="115" y="749" text-anchor="middle" class="ns">context-rot %</text>
+<rect class="node" x="534" y="700" width="130" height="58" rx="8"/>
+<text x="599" y="725" text-anchor="middle" class="nt mono">ingest.py</text>
+<text x="599" y="740" text-anchor="middle" class="ns">exactly-once</text>
+<text x="599" y="751" text-anchor="middle" class="ns">byte-offset</text>
+<rect class="node approx" x="690" y="700" width="150" height="58" rx="8"/>
+<text x="765" y="722" text-anchor="middle" class="nt mono" fill="#EF9F27">SQLite trace.db</text>
+<text x="765" y="737" text-anchor="middle" class="ns">projection · tokens/cost</text>
+<text x="765" y="749" text-anchor="middle" class="ns">APPROX (labeled)</text>
+<rect class="node" x="866" y="700" width="180" height="58" rx="8"/>
+<text x="956" y="722" text-anchor="middle" class="nt">FastAPI API</text>
+<text x="956" y="737" text-anchor="middle" class="ns mono">/state /roi /evidence</text>
+<text x="956" y="749" text-anchor="middle" class="ns mono">/stream (SSE)</text>
+<rect class="node" x="1072" y="700" width="190" height="58" rx="8"/>
+<text x="1167" y="722" text-anchor="middle" class="nt">React + Vite dashboard</text>
+<text x="1167" y="737" text-anchor="middle" class="ns">timeline · durations · gauge</text>
+<text x="1167" y="749" text-anchor="middle" class="ns">evidence browser · ROI</text>
+
+<path class="fgrn" d="M612,578 C612,640 605,660 600,698"/>
+<text x="616" y="640" class="el" fill="#1D9E75">reads truth</text>
+<path class="flow" d="M811,578 C811,640 660,660 632,700"/>
+<text x="700" y="648" class="el">triggers</text>
+<path class="flow" d="M664,729 L688,729"/>
+<path class="flow" d="M840,729 L864,729"/>
+<path class="flow" d="M1046,729 L1070,729"/>
+<path class="flow" d="M190,729 C520,690 980,690 1071,732"/>
+<text x="300" y="700" class="el">context-rot gauge</text>
+<path class="fblue" d="M1010,758 C1010,775 1120,775 1140,760"/>
+<text x="1040" y="775" class="el" fill="#378ADD">SSE live push</text>
+
+<path class="fdef" d="M652,306 C560,420 240,440 100,518"/>
+<text x="300" y="470" class="el">every tool call is observed →</text>
+
+<rect class="zone" x="30" y="808" width="1420" height="170" rx="14"/>
+<text x="46" y="830" class="zlabel">D · Git &amp; evidence plane</text>
+<text x="300" y="830" class="zsub">deterministic · version-controlled · what actually shipped (never estimated)</text>
+
+<rect class="node data" x="40" y="858" width="130" height="58" rx="8"/>
+<text x="105" y="880" text-anchor="middle" class="nt" fill="#1D9E75">git commit</text>
+<text x="105" y="895" text-anchor="middle" class="ns">feature branch</text>
+<text x="105" y="907" text-anchor="middle" class="ns">Trace-Agent/Model trailers</text>
+<rect class="node data" x="196" y="858" width="184" height="58" rx="8"/>
+<text x="288" y="880" text-anchor="middle" class="nt mono" fill="#1D9E75">review-packages/&lt;task&gt;/</text>
+<text x="288" y="895" text-anchor="middle" class="ns">git_diff · test_logs</text>
+<text x="288" y="907" text-anchor="middle" class="ns">validation_report · ai_review</text>
+<rect class="node" x="406" y="858" width="110" height="58" rx="8"/>
+<text x="461" y="884" text-anchor="middle" class="nt">Pull Request</text>
+<text x="461" y="899" text-anchor="middle" class="ns">base = main</text>
+<rect class="node" x="542" y="852" width="300" height="70" rx="8"/>
+<text x="692" y="868" text-anchor="middle" class="nt">GitHub Actions CI · ci.yml</text>
+<rect x="552" y="876" width="92" height="38" rx="6" fill="none" stroke="#E24B4A" stroke-width="1.6"/>
+<text x="598" y="892" text-anchor="middle" class="ns" fill="#E24B4A">backend</text>
+<text x="598" y="904" text-anchor="middle" class="ns" fill="#E24B4A">ruff+pytest</text>
+<rect x="650" y="876" width="92" height="38" rx="6" fill="none" stroke="#E24B4A" stroke-width="1.6"/>
+<text x="696" y="892" text-anchor="middle" class="ns" fill="#E24B4A">frontend</text>
+<text x="696" y="904" text-anchor="middle" class="ns" fill="#E24B4A">eslint+build</text>
+<rect x="748" y="876" width="86" height="38" rx="6" fill="none" stroke="#378ADD" stroke-width="1.6" stroke-dasharray="5 3"/>
+<text x="791" y="892" text-anchor="middle" class="ns" fill="#378ADD">ai_review</text>
+<text x="791" y="904" text-anchor="middle" class="ns" fill="#378ADD">advisory</text>
+<rect class="node gate" x="868" y="858" width="150" height="58" rx="8"/>
+<text x="943" y="880" text-anchor="middle" class="nt" fill="#E24B4A">Branch protection</text>
+<text x="943" y="895" text-anchor="middle" class="tag" fill="#E24B4A">HARD GATE</text>
+<text x="943" y="907" text-anchor="middle" class="ns">required checks + 1 approval</text>
+<rect class="node data" x="1044" y="858" width="140" height="58" rx="8"/>
+<text x="1114" y="884" text-anchor="middle" class="nt" fill="#1D9E75">merge → main</text>
+<text x="1114" y="899" text-anchor="middle" class="ns">protected trunk</text>
+
+<path class="fgrn" d="M170,887 L194,887"/>
+<path class="fgrn" d="M380,887 L404,887"/>
+<path class="flow" d="M516,887 L540,887"/>
+<path class="flow" d="M842,887 L866,887"/>
+<path class="fgrn" d="M1018,887 L1042,887"/>
+
+<path class="fdef" d="M1346,304 C1430,420 1430,700 1300,820 C1250,860 1210,872 1186,884"/>
+<text x="1360" y="600" class="el" transform="rotate(90 1360 600)">Close = PR + merge (detailed here)</text>
+
+<rect class="zone" x="30" y="992" width="1420" height="248" rx="14" stroke="#888780" stroke-dasharray="8 5"/>
+<text x="46" y="1014" class="zlabel" fill="#888780">E · Auto-research extension</text>
+<text x="300" y="1014" class="tag" fill="#EF9F27">DEFERRED · DRAFT v1 — spec only, no orchestrator yet</text>
+
+<rect class="node defer" x="40" y="1030" width="220" height="44" rx="8"/>
+<text x="150" y="1051" text-anchor="middle" class="nt mono">trace/ORBITAL_PATHS.yaml</text>
+<text x="150" y="1065" text-anchor="middle" class="ns">loop-engine state machine</text>
+<rect class="node defer" x="276" y="1030" width="300" height="44" rx="8"/>
+<text x="426" y="1051" text-anchor="middle" class="nt mono">trace/autoresearch/</text>
+<text x="426" y="1065" text-anchor="middle" class="ns">template · scorers · baselines · winners · ledger</text>
+<rect class="node defer" x="600" y="1026" width="810" height="52" rx="8"/>
+<text x="1005" y="1046" text-anchor="middle" class="ns">Use ONLY if: objective metric · fast feedback · fixed per-experiment budget · failures cheap/sandboxed · hard-to-game scorer</text>
+<text x="1005" y="1064" text-anchor="middle" class="ns">(else reward-hacking) — never for UI aesthetics, strategy, slow/subjective goals</text>
+
+<rect class="node defer" x="40" y="1118" width="120" height="56" rx="8"/>
+<text x="100" y="1142" text-anchor="middle" class="nt">Pick asset</text>
+<text x="100" y="1157" text-anchor="middle" class="ns">editable_asset</text>
+<rect class="node defer" x="196" y="1118" width="120" height="56" rx="8"/>
+<text x="256" y="1142" text-anchor="middle" class="nt">AI mutate</text>
+<text x="256" y="1157" text-anchor="middle" class="ns">variant copy</text>
+<rect class="node defer" x="352" y="1118" width="130" height="56" rx="8"/>
+<text x="417" y="1142" text-anchor="middle" class="nt">Run LOCKED scorer</text>
+<text x="417" y="1157" text-anchor="middle" class="ns">objective number</text>
+<rect class="node defer" x="518" y="1118" width="130" height="56" rx="8"/>
+<text x="583" y="1142" text-anchor="middle" class="nt">Compare baseline</text>
+<text x="583" y="1157" text-anchor="middle" class="ns">Δ ≥ threshold?</text>
+<rect class="node defer" x="684" y="1118" width="150" height="56" rx="8"/>
+<text x="759" y="1138" text-anchor="middle" class="nt">Keep / discard</text>
+<text x="759" y="1153" text-anchor="middle" class="ns">in-scope · checks pass</text>
+<text x="759" y="1165" text-anchor="middle" class="ns">→ EXPERIMENT_LEDGER</text>
+<rect class="node human" x="870" y="1118" width="150" height="56" rx="8"/>
+<text x="945" y="1140" text-anchor="middle" class="nt" fill="#7F77DD">Human review</text>
+<text x="945" y="1155" text-anchor="middle" class="ns">before any merge</text>
+
+<path class="fdef" d="M160,1146 L194,1146"/>
+<path class="fdef" d="M316,1146 L350,1146"/>
+<path class="fdef" d="M482,1146 L516,1146"/>
+<path class="fdef" d="M648,1146 L682,1146"/>
+<path class="fdef" d="M834,1146 L868,1146"/>
+<path class="fdef" d="M740,1174 C600,1230 360,1216 256,1176"/>
+<text x="470" y="1222" class="el">discard → next variant (≤ max_iterations / budget)</text>
+<path class="fdef" d="M945,1118 C945,1040 700,960 515,916"/>
+<text x="690" y="1006" class="el" fill="#7F77DD">winner enters as a normal PR ↑</text>
+
+<text x="46" y="1280" class="zlabel">Legend</text>
+<rect x="120" y="1268" width="26" height="16" rx="3" fill="none" stroke="#E24B4A" stroke-width="2.2"/>
+<text x="154" y="1280" class="ns">Hard gate — blocks merge</text>
+<rect x="330" y="1268" width="26" height="16" rx="3" fill="none" stroke="#378ADD" stroke-width="1.8" stroke-dasharray="5 3"/>
+<text x="364" y="1280" class="ns">Advisory — informs, never blocks</text>
+<rect x="580" y="1268" width="26" height="16" rx="3" fill="none" stroke="#7F77DD" stroke-width="2.2"/>
+<text x="614" y="1280" class="ns">Human approval</text>
+<rect x="740" y="1268" width="26" height="16" rx="3" fill="none" stroke="#1D9E75" stroke-width="1.8"/>
+<text x="774" y="1280" class="ns">Real / deterministic (in git)</text>
+<rect x="980" y="1268" width="26" height="16" rx="3" fill="none" stroke="#EF9F27" stroke-width="1.8"/>
+<text x="1014" y="1280" class="ns">Approximate (labeled)</text>
+<rect x="1180" y="1268" width="26" height="16" rx="3" fill="none" stroke="#888780" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="1214" y="1280" class="ns">Deferred / v2</text>
+</svg>
