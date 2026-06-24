@@ -1,0 +1,30 @@
+{
+  "task_id": "TASK-DEMO-001",
+  "agent": "claude",
+  "model": "claude-opus-4-8",
+  "mode": "execution",
+  "intent": "Add a /healthz liveness endpoint to the telemetry server and a test for it.",
+  "why": "Smallest real change that exercises the full governed loop end-to-end: a trivially reviewable diff with a deterministic pass/fail.",
+  "allowed_scope": [
+    "src/server/main.py",
+    "tests/test_server.py"
+  ],
+  "forbidden_scope": [
+    "src/ui/**",
+    ".claude/**",
+    ".github/**",
+    "agent-context/**"
+  ],
+  "claim": {
+    "tests": "pass",
+    "lint": "clean"
+  },
+  "verify_command": "ruff check src/server tests && python -m pytest -q",
+  "acceptance": [
+    "GET /healthz returns 200 with body {\"status\": \"ok\"}",
+    "A test asserts the status code and body",
+    "No files changed outside allowed_scope",
+    "ruff + pytest both green"
+  ],
+  "evidence_dir": "review-packages/TASK-DEMO-001/"
+}

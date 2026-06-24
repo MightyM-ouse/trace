@@ -6,7 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# Least-privilege by default; the advisory review job opts into pull-requests:write.
+permissions:
+  contents: read
+
 jobs:
+  # ----- REQUIRED GATES (these block merge via branch protection) -----
   backend:
     name: Backend (FastAPI)
     runs-on: ubuntu-latest
@@ -40,3 +45,36 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+
+  # ----- ADVISORY GATE (posts recommendations; never blocks merge) -----
+  # This is the "AI reviews the files so I don't have to" step. It is
+  # deliberately non-blocking: deterministic checks (backend/frontend) and a
+  # human approval are what gate merge. The AI review only informs the human.
+  #
+  # RECOMMENDED ALTERNATIVE: instead of maintaining this job, install the
+  # Greptile or CodeRabbit GitHub App (zero code, repo-aware reviews). Keep
+  # this job only if you want a self-hosted reviewer you fully control.
+  ai_review:
+    name: AI review (advisory)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    continue-on-error: true          # advisory: a failure here must not block
+    permissions:
+      contents: read
+      pull-requests: write           # to post the review as a PR comment
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0             # need base branch for the diff
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install reviewer deps
+        run: pip install anthropic
+      - name: Run AI review on the PR diff
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: python scripts/ai_review.py

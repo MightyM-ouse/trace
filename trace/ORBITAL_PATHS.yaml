@@ -1,57 +1,84 @@
-# ORBITAL_PATHS.yaml
-# State machine definition for TRACE Loop Engine
+# ORBITAL_PATHS.yaml — TRACE governed execution loop (v1, PR/CI-mapped)
+#
+# This is the EXECUTION half of loop engineering. The auto-research engine
+# (self-optimizing scorers) is intentionally OUT of v1 — see WIRING_PLAN.md.
+#
+# Design principle: the GitHub Pull Request IS the state machine. This file
+# documents how each TRACE state maps onto a real PR/CI event and which of the
+# THREE existing roles (Planner / Builder / Validator — see agent-context/roles/)
+# owns it. Nothing here invents new roles or a parallel engine; the gates are
+# enforced by branch protection + required CI checks + required human review.
 
 workflow_id: governed_execution_v1
+
+# The three real roles. Earlier draft invented six (architect, reviewer,
+# developer, verifier, final_reviewer, validator) — collapsed back to these.
+roles:
+  Planner:   { collapses: [architect, plan_reviewer] }
+  Builder:   { collapses: [developer] }
+  Validator: { collapses: [validator, verifier, final_reviewer] }
+
+# Where each gate is actually enforced (not just described).
+enforcement:
+  validate_gate:  "required CI checks: backend (ruff + pytest), frontend (eslint + build)"
+  verify_gate:    "advisory AI review job posts ranked recommendations to the PR (non-blocking)"
+  human_gates:    "branch protection on main: require >=1 approving review before merge"
+  evidence:       "review-packages/<task_id>/ (diff + test logs + validation report) — NOT trace/evidence/*_light_curve.md"
+
 states:
-  - task_intake
-  - classify_mode
-  - plan
-  - review_plan
-  - human_plan_approval
-  - implement
-  - validate
-  - verify
-  - final_review
-  - evidence_update
-  - human_close_approval
-  - closed
+  - task_intake          # open an issue / fill .trace/CURRENT_TASK.json (intent, scope, claim)
+  - classify_mode        # investigation vs execution
+  - plan                 # Planner
+  - human_plan_approval  # human ratifies the plan (PR description or issue)
+  - implement            # Builder, on a feature branch
+  - validate             # required CI checks
+  - verify               # advisory AI review + claim==reality check
+  - human_close_approval # required PR approval
+  - evidence_update       # write review-packages/<task_id>/
+  - closed               # merged to main
+  - needs_human          # terminal: retries exhausted or gate failed -> stop, escalate
+
 transitions:
   task_intake:
     next: classify_mode
   classify_mode:
-    if_investigation_needed: route_context
+    if_investigation_needed: plan      # route context first, then plan
     if_execution_ready: plan
   plan:
-    role: architect
-    next: review_plan
-  review_plan:
-    role: reviewer
-    if_approved: human_plan_approval
-    if_rejected: plan
+    role: Planner
+    next: human_plan_approval
   human_plan_approval:
-    required: true
-    next: implement
+    required: true                      # do not build on an unratified plan (TRACE rule C)
+    if_approved: implement
+    if_rejected: plan
   implement:
-    role: developer
+    role: Builder
+    branch: "feature/{task_id}"         # never commit straight to main
     next: validate
   validate:
-    role: validator
-    checks: [lint, tests, build]
+    role: Validator
+    checks: [lint, tests, build]        # = required CI checks
     if_pass: verify
     if_fail: implement
     max_retries: 3
+    on_retries_exhausted: needs_human   # <-- was missing: no infinite loop
   verify:
-    role: verifier
-    if_pass: final_review
+    role: Validator
+    advisory_ai_review: true            # posts recommendations; does NOT block
+    claim_matches_reality: true         # reuse .claude/hooks/trace_hook.py scope+exit-code logic
+    if_pass: human_close_approval
     if_fail: implement
     max_retries: 2
-  final_review:
-    role: final_reviewer
-    if_approved: evidence_update
-    if_rejected: implement
-  evidence_update:
-    output: trace/evidence/{task_id}_light_curve.md
-    next: human_close_approval
+    on_retries_exhausted: needs_human
   human_close_approval:
-    required: true
+    required: true                      # human reads the AI review, approves or requests changes
+    if_approved: evidence_update
+    if_changes_requested: implement
+  evidence_update:
+    output: review-packages/{task_id}/  # consistent with AGENTS.md rule E
     next: closed
+  closed:
+    terminal: true
+  needs_human:
+    terminal: true
+    action: "apply label needs-human, stop the loop, summarize what blocked it"
