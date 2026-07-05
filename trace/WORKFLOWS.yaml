@@ -1,0 +1,55 @@
+version: 1
+
+synchronization_gate:
+  required_before: [instruction_issue, execution_start, review_verdict, dependent_task_start]
+  checks:
+    - default_branch_and_accepted_commit
+    - status_and_applicable_registries
+    - active_issue_task_and_amendments
+    - assigned_branch_starting_and_latest_commit
+    - pull_request_reviews_and_checks
+    - active_work_ownership_dependencies_and_integration_order
+    - known_local_unpushed_work
+  outcomes:
+    SYNC_PASS: proceed
+    SYNC_BLOCKED: stop_reconcile_and_report
+    SYNC_UNVERIFIED_LOCAL_STATE: stop_until_owner_accounts_for_local_state
+
+modes:
+  discovery:
+    flow: [synchronize, identify_outcome, route_context, investigate, compare_options, propose]
+    outputs: [findings, options, recommendation, decisions_required]
+  execution:
+    flow: [synchronize, confirm_envelope, investigate_method, implement, validate, capture_evidence, open_or_update_pr]
+    outputs: [changes, checks, evidence, markdown_handoff, json_handoff, pull_request]
+  review:
+    flow: [synchronize, verify_scope, inspect_diff, inspect_evidence, assess_risk, issue_verdict]
+    outputs: [findings, verdict, residual_risk]
+  mixed:
+    flow: [synchronize, discovery, investigation, execution, review]
+    outputs: [mode_history, evidence_chain, final_status]
+
+parallel_execution:
+  enabled: true
+  unique_per_task: [task_id, branch, worktree, starting_commit, pull_request, accountable_worker]
+  writable_path_ownership: exclusive
+  dependencies_and_integration_order: required
+
+git:
+  direct_push_main: forbidden
+  force_push: forbidden
+  assigned_task_branch_commit: allowed_within_approved_envelope
+  assigned_task_branch_push: allowed_within_approved_envelope
+  pull_request: required
+  merge_authority: product_owner_or_maintainer
+  self_acceptance: forbidden
+
+evidence:
+  task_packet: required
+  markdown_handoff: required_for_meaningful_work
+  json_handoff_schema: trace/schemas/agent_handoff.schema.json
+  exact_failures_visible: true
+  skipped_checks_visible: true
+  curated_outputs: repository
+  large_raw_outputs: actions_artifact
+

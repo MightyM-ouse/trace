@@ -1,57 +1,69 @@
-# ORBITAL_PATHS.yaml
-# State machine definition for TRACE Loop Engine
+# ORBITAL_PATHS.yaml - TRACE governed execution loop (v1, PR/CI mapped)
+#
+# This file documents the execution workflow. It does not implement live autonomous
+# dispatch. Human approval and branch protection remain the close gate.
 
 workflow_id: governed_execution_v1
+
+roles:
+  Planner: {collapses: [architect, plan_reviewer]}
+  Builder: {collapses: [developer]}
+  Validator: {collapses: [validator, verifier, final_reviewer]}
+
+enforcement:
+  validate_gate: "required CI checks: backend, frontend, and governance"
+  human_gates: "branch protection on main and Product Owner or maintainer approval"
+  evidence: "review-packages/ and trace/evidence/"
+
 states:
   - task_intake
   - classify_mode
   - plan
-  - review_plan
   - human_plan_approval
   - implement
   - validate
   - verify
-  - final_review
-  - evidence_update
   - human_close_approval
+  - evidence_update
   - closed
+  - needs_human
 transitions:
   task_intake:
     next: classify_mode
   classify_mode:
-    if_investigation_needed: route_context
+    if_investigation_needed: plan
     if_execution_ready: plan
   plan:
-    role: architect
-    next: review_plan
-  review_plan:
-    role: reviewer
-    if_approved: human_plan_approval
-    if_rejected: plan
+    role: Planner
+    next: human_plan_approval
   human_plan_approval:
     required: true
-    next: implement
+    if_approved: implement
+    if_rejected: plan
   implement:
-    role: developer
+    role: Builder
     next: validate
   validate:
-    role: validator
+    role: Validator
     checks: [lint, tests, build]
     if_pass: verify
     if_fail: implement
     max_retries: 3
+    on_retries_exhausted: needs_human
   verify:
-    role: verifier
-    if_pass: final_review
+    role: Validator
+    if_pass: human_close_approval
     if_fail: implement
     max_retries: 2
-  final_review:
-    role: final_reviewer
-    if_approved: evidence_update
-    if_rejected: implement
-  evidence_update:
-    output: trace/evidence/{task_id}_light_curve.md
-    next: human_close_approval
+    on_retries_exhausted: needs_human
   human_close_approval:
     required: true
+    if_approved: evidence_update
+    if_changes_requested: implement
+  evidence_update:
+    output: "review-packages/{task_id}/ and/or trace/evidence/{task_id}_LIGHT_CURVE.md"
     next: closed
+  closed:
+    terminal: true
+  needs_human:
+    terminal: true

@@ -1,0 +1,49 @@
+meta:
+  version: 1
+  enforcement: repository_rules_plus_task_envelope_plus_active_path_ownership
+  final_authority: product_owner_or_maintainer
+  execution_authority: approved_task_envelope
+
+roles:
+  product_owner:
+    responsibilities: [scope, priority, functional_acceptance, risk_acceptance, merge, release]
+    must_not: [replace_technical_evidence_with_manual_assertion]
+
+  system_architect:
+    worker: configurable
+    modes: [discovery, execution, review, mixed]
+    responsibilities: [synchronization_gate, task_design, ownership_coordination, integration_order, architecture_review, merge_recommendation]
+    verdicts: [APPROVE_TO_MERGE, CHANGES_REQUIRED, BLOCKED]
+    must_not: [merge, self_accept, invent_state, hide_discrepancy, make_binding_product_decisions]
+
+  planner:
+    worker: configurable
+    modes: [discovery, review]
+    responsibilities: [architecture, requirements, specification, governance_design]
+    must_not: [self_approve, merge, force_push, silently_change_scope]
+
+  builder:
+    worker: configurable
+    modes: [execution, investigation]
+    responsibilities: [implementation, refactoring, migrations, tests, tooling, ci]
+    must_not: [push_main, merge, self_accept, force_push, bypass_policy, modify_other_task_ownership]
+
+  independent_validator:
+    worker: configurable
+    modes: [review, investigation]
+    responsibilities: [qa, security_review, architecture_conformance, evidence_verification]
+    must_not: [implement_feature_under_review, self_approve, merge, force_push]
+
+  runtime_experiment:
+    worker: optional
+    status: inactive
+    activation_requires: [approved_capability_lab_task, isolated_runtime, explicit_tools_and_paths, policy_gate, independent_review]
+    must_not: [self_activate, credential_use, external_action, unassigned_repository_write, push_main, merge]
+
+common_worker_requirements:
+  synchronization: SYNC_PASS
+  branch_and_worktree_isolation: required
+  active_work_registration: required
+  handoff: [markdown, schema_valid_json]
+  protected_boundaries: docs/governance/MULTI_AGENT_EXECUTION_POLICY.md
+

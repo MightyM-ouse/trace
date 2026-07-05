@@ -16,11 +16,39 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install dependencies
-        run: pip install -r src/server/requirements.txt ruff
+        run: pip install -r src/server/requirements.txt -r scripts/governance-requirements.txt ruff
       - name: Lint
         run: ruff check src/server tests
       - name: Test
         run: python -m pytest -q
+
+  governance:
+    name: Governance contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install governance dependencies
+        run: pip install -r scripts/governance-requirements.txt
+      - name: Validate JSON files
+        run: |
+          python -m json.tool trace/CELESTIAL_INDEX.json >/dev/null
+          python -m json.tool trace/schemas/agent_handoff.schema.json >/dev/null
+      - name: Validate YAML files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          for path in Path("trace").glob("*.yaml"):
+              yaml.safe_load(path.read_text())
+              print(f"valid {path}")
+          PY
+      - name: Run TRACE governance validators
+        run: |
+          python scripts/validate_multi_agent_governance.py
+          python scripts/validate_agent_routing_and_responses.py
 
   frontend:
     name: Frontend (React + Vite)
