@@ -1,6 +1,10 @@
 # TRACE Auto-Research & Loop Engineering Extension
 
-*Version 1.0 – Draft*
+*Version 1.0 - Draft / roadmap*
+
+This is a design proposal, not a live autonomous dispatch system. It must not be presented
+as implemented TRACE runtime behavior until an orchestrator, policy gate, scorer isolation,
+and evidence workflow exist in the repository and pass review.
 
 ## Purpose
 
@@ -8,7 +12,7 @@ This document outlines an extension to the TRACE methodology that integrates loo
 
 ## Goals
 
-- Reduce manual intervention in multi‑agent loops.
+- Reduce manual intervention in multi-agent loops.
 - Ensure that every task follows a governed state machine with explicit stop conditions and human approval gates.
 - Enable autonomous optimization of measurable assets (e.g. code runtime, prompt quality, context efficiency) using auto‑research cycles.
 - Maintain transparency, evidence, and governance as defined in the TRACE core.

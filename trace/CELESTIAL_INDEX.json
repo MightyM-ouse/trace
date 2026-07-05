@@ -1,0 +1,55 @@
+{
+  "description": "TRACE context routing index for adopting projects.",
+  "version": 1,
+  "areas": {
+    "trace-governance": {
+      "status": "CURRENT",
+      "source_files": [
+        "AGENTS.md",
+        "docs/governance/",
+        "trace/TRACE_CONFIG.yaml",
+        "trace/STAR_MAP.md",
+        "trace/ACTIVE_WORK_REGISTRY.yaml",
+        "trace/ROLE_REGISTRY.yaml",
+        "trace/WORKFLOWS.yaml",
+        "trace/templates/",
+        "trace/schemas/"
+      ],
+      "default_mode": "discovery"
+    },
+    "evidence": {
+      "status": "CURRENT",
+      "source_files": [
+        "review-packages/",
+        "trace/evidence/",
+        "trace/tasks/"
+      ],
+      "default_mode": "review"
+    },
+    "telemetry": {
+      "status": "CURRENT",
+      "source_files": [
+        ".claude/hooks/",
+        "src/server/",
+        "src/ui/"
+      ],
+      "default_mode": "investigation"
+    },
+    "auto-research": {
+      "status": "DRAFT",
+      "source_files": [
+        "TRACE_AUTO_RESEARCH_EXTENSION.md",
+        "trace/autoresearch/"
+      ],
+      "default_mode": "discovery"
+    }
+  },
+  "rules": {
+    "allow_full_repo_scan": false,
+    "escalate_context_only_when_justified": true,
+    "verify_repository_before_current_state_claims": true,
+    "require_sync_pass_before_worker_instruction": true,
+    "do_not_treat_planned_files_as_delivered": true
+  }
+}
+

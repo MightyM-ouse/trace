@@ -1,0 +1,45 @@
+version: 1
+status: CURRENT
+final_authority: product_owner_or_maintainer
+router: system_architect
+
+agents:
+  system_architect:
+    status: active
+    primary: [synchronization, task_framing, routing, evidence_review, merge_recommendation]
+    prohibited: [self_approval, merge]
+  planner:
+    status: active
+    primary: [architecture, requirements, specifications, governance_design]
+    prohibited: [binding_product_decision, merge]
+  builder:
+    status: active
+    primary: [implementation, refactoring, migrations, tests, tooling, ci]
+    prohibited: [product_authority, architecture_acceptance, self_approval, merge]
+  independent_validator:
+    status: active
+    primary: [qa, security_review, architecture_conformance, evidence_verification]
+    prohibited: [primary_implementation_of_reviewed_feature, self_approval, merge]
+  runtime_worker:
+    status: inactive
+    primary_when_activated: [bounded_local_experiment, sandboxed_research, governed_verification]
+    activation_requires: [approved_capability_lab_task, isolated_runtime, policy_gate, audit_trail, independent_review]
+    prohibited: [routing_while_inactive, canonical_authority, unrestricted_repository_or_system_action, merge]
+
+routes:
+  architecture_design: {primary: planner, reviewer: system_architect}
+  governance_change: {primary: planner, reviewer: independent_validator}
+  product_implementation: {primary: builder, reviewer: independent_validator}
+  code_defect: {primary: builder, reviewer: risk_based_independent_validator}
+  ci_tooling_migration: {primary: builder, reviewer: risk_based_independent_validator}
+  independent_qa_security: {primary: independent_validator, reviewer: system_architect}
+  status_reconciliation: {primary: system_architect, reviewer: risk_based_planner}
+  local_runtime_experiment: {primary: runtime_worker_after_activation, reviewer: independent_validator_then_system_architect}
+
+selection_rules:
+  smallest_capable_agent_set: true
+  implementation_and_independent_review_separated: true
+  verify_active_status_before_route: true
+  verify_ownership_before_parallel_work: true
+  repository_native_instruction_required: true
+

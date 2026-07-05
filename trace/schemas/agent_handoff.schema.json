@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/owner/repository/trace/schemas/agent_handoff.schema.json",
+  "title": "TRACE Agent Handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task",
+    "provenance",
+    "repository_state",
+    "synchronization",
+    "outcome",
+    "changes",
+    "downloads",
+    "validation",
+    "deviations",
+    "impacts",
+    "decisions_required",
+    "recommended_next_action"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "agent", "role"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/task_status" },
+        "agent": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instruction_prepared_by", "instruction_approved_by", "intended_reviewer", "review_status", "review_completed_by"],
+      "properties": {
+        "instruction_prepared_by": { "type": "string", "minLength": 1 },
+        "instruction_approved_by": { "type": "string", "minLength": 1 },
+        "intended_reviewer": { "type": "string", "minLength": 1 },
+        "review_status": { "enum": ["PENDING", "COMPLETED"] },
+        "review_completed_by": { "type": ["string", "null"] }
+      }
+    },
+    "repository_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "starting_commit", "final_commit", "pull_request"],
+      "properties": {
+        "branch": { "type": "string", "minLength": 1 },
+        "starting_commit": { "$ref": "#/$defs/sha" },
+        "final_commit": { "oneOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] },
+        "pull_request": { "type": ["string", "null"] }
+      }
+    },
+    "synchronization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "checked_at", "sources", "discrepancies"],
+      "properties": {
+        "verdict": { "enum": ["SYNC_PASS", "SYNC_BLOCKED", "SYNC_UNVERIFIED_LOCAL_STATE"] },
+        "checked_at": { "type": "string" },
+        "sources": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "discrepancies": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["summary", "acceptance_criteria"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "acceptance_criteria": { "type": "array", "items": { "$ref": "#/$defs/check" } }
+      }
+    },
+    "changes": { "type": "array", "items": { "$ref": "#/$defs/change" } },
+    "downloads": { "type": "array", "items": { "$ref": "#/$defs/download" } },
+    "validation": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+    "deviations": { "type": "array", "items": { "type": "string" } },
+    "impacts": {
+      "type": "object",
+      "required": ["architecture", "security", "integration", "residual_risk"],
+      "properties": {
+        "architecture": { "type": "string" },
+        "security": { "type": "string" },
+        "integration": { "type": "string" },
+        "residual_risk": { "type": "string" }
+      }
+    },
+    "decisions_required": { "type": "array", "items": { "type": "string" } },
+    "recommended_next_action": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "task_status": {
+      "type": "string",
+      "enum": ["PLANNED", "AUTHORIZED", "IN_PROGRESS", "BLOCKED", "PUSHED_FOR_REVIEW", "CHANGES_REQUIRED", "READY_FOR_PRODUCT_OWNER", "MERGED", "CLOSED"]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "status", "evidence"],
+      "properties": {
+        "name": { "type": "string" },
+        "status": { "enum": ["PASS", "FAIL", "SKIPPED", "BLOCKED", "NOT_APPLICABLE"] },
+        "command": { "type": ["string", "null"] },
+        "evidence": { "type": "string" }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "purpose"],
+      "properties": {
+        "path": { "type": "string" },
+        "purpose": { "type": "string" },
+        "ownership_expansion_reason": { "type": ["string", "null"] }
+      }
+    },
+    "download": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_url", "publisher", "purpose", "version", "destination", "size_bytes", "sha256", "license", "executed", "security_checks", "resulting_changes"],
+      "properties": {
+        "source_url": { "type": "string" },
+        "publisher": { "type": "string" },
+        "purpose": { "type": "string" },
+        "version": { "type": "string" },
+        "destination": { "type": "string" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "license": { "type": "string" },
+        "executed": { "type": "boolean" },
+        "security_checks": { "type": "array", "items": { "type": "string" } },
+        "resulting_changes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
+

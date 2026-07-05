@@ -21,4 +21,5 @@ Link the review-package in `review-packages/` and confirm it contains:
 
 ## Checklist
 - [ ] CI green (backend tests + frontend build)
+- [ ] Governance checks green when TRACE contracts, task packets, routing, or evidence schemas changed
 - [ ] No secrets committed; `agent-logs/` not included

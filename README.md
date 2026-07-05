@@ -26,14 +26,12 @@ TRACE is two things:
 
 ## Architecture
 
-![TRACE architecture and flow](docs/architecture.png)
+The canonical architecture diagram is now maintained as GitHub-rendered Mermaid in
+[`docs/architecture.md`](docs/architecture.md). The existing PNG/SVG files are fallback
+renders only; Mermaid is the editable source of truth.
 
-Four planes that run together: the **governed execution loop** (control — the PR is the
-state machine), the **telemetry data plane** (observe — `events.jsonl` is the write-ahead
-truth, SQLite is an approximate projection), the **git & evidence plane** (what actually
-shipped, never estimated), and the **deferred auto-research extension**. Colors: red blocks,
-blue informs, violet = human gate, green = real/in-git, amber = approximate, dashed = not
-built yet. Full-resolution vector: [`docs/architecture.svg`](docs/architecture.svg).
+TRACE has five cooperating planes: the core methodology, repository source-of-truth,
+worker governance, validation, and local telemetry.
 
 ## The TRACE algorithm
 
@@ -63,13 +61,16 @@ TRACE is deliberate about what is **measured** vs **estimated**:
 | Role personas + permission‑rule boundaries | **CURRENT** |
 | FastAPI telemetry server (SQLite + SSE) | **CURRENT** |
 | React dashboard: live timeline, durations, context‑rot gauge, evidence browser | **CURRENT** |
+| Reusable governance templates, task packets, handoffs, and worker adapters | **CURRENT** |
+| Project-neutral multi-agent execution policy and source-of-truth policy | **CURRENT** |
+| Optional governance validators for schemas, routing, and path ownership | **CURRENT** |
 | Approximate ROI panel (subagent tokens + status‑line cost snapshot) | **CURRENT** |
 | OpenTelemetry token/cost integration (accurate session totals) | **PLANNED (v1.1)** |
 | Interactive `npm run init` setup wizard | **CURRENT** |
 | Real subagents with per‑agent token telemetry | **PLANNED (v2)** |
 | Cross‑session analytics & baseline‑vs‑TRACE comparison | **PLANNED (v2)** |
 | Team / multi‑user telemetry + hosted dashboard | **PLANNED (v2)** |
-| Adaptive Orbit & Auto‑Research extension | **DRAFT (v1.0)** |
+| Adaptive Orbit & Auto‑Research extension | **DRAFT / ROADMAP** |
 
 ## Quick start
 
@@ -96,7 +97,13 @@ The Adaptive Orbit extension integrates loop engineering and objective optimizat
 - **Loop Engine** — a state machine defined in `trace/ORBITAL_PATHS.yaml` that moves tasks through planning, review, implementation, validation, verification, and closure, with retries and explicit approval gates.
 - **Auto‑Research Engine** — for measurable optimization tasks (e.g. improving code performance, test runtime, prompt quality or context efficiency). Agents iteratively modify an asset, run a locked scoring script, and adopt changes only when an objective metric improves. Templates, scores and experiment logs live under `trace/autoresearch/`.
 
-Use Adaptive Orbit only when the goal can be scored quickly and objectively. See [`TRACE_AUTO_RESEARCH_EXTENSION.md`](./TRACE_AUTO_RESEARCH_EXTENSION.md) for details and examples.
+Use Adaptive Orbit only when the goal can be scored quickly and objectively. It is not a live autonomous dispatch system in v1. See [`TRACE_AUTO_RESEARCH_EXTENSION.md`](./TRACE_AUTO_RESEARCH_EXTENSION.md) for details and examples.
+
+## Reusing TRACE In Another Project
+
+Start with [`docs/adoption/apply-trace-to-your-project.md`](docs/adoption/apply-trace-to-your-project.md).
+Reusable worker templates live under `templates/workers/`; project-neutral operating files,
+task templates, evidence templates, and handoff schemas live under `trace/`.
 
 ## Known limitations (v1)
 

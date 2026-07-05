@@ -1,0 +1,41 @@
+trace_version: "1.0"
+
+project:
+  name: "example-project"
+  repository: "owner/repository"
+  canonical_source: "github"
+
+operating_model:
+  methodology: "TRACE"
+  supported_modes: [discovery, investigation, execution, review, mixed]
+  protected_branch: "main"
+  task_branch_required: true
+  pull_request_required: true
+  worker_self_merge: false
+
+context:
+  minimal_context: true
+  require_context_route: true
+  allow_full_repo_scan: false
+  verify_repository_before_current_state_claims: true
+
+human_authority:
+  final_authority: "product_owner_or_maintainer"
+  approval_required_for:
+    - product_scope
+    - functional_acceptance
+    - risk_acceptance
+    - merge
+    - release
+    - capability_activation
+    - public_runtime_exposure
+
+artifacts:
+  status_file: "trace/STAR_MAP.md"
+  context_index: "trace/CELESTIAL_INDEX.json"
+  role_registry: "trace/ROLE_REGISTRY.yaml"
+  workflows: "trace/WORKFLOWS.yaml"
+  task_dir: "trace/tasks/"
+  evidence_dir: "trace/evidence/"
+  governance_dir: "docs/governance/"
+

@@ -1,0 +1,31 @@
+version: 1
+canonical_repository: owner/repository
+synchronization_authority: live_repository_branch_head
+
+status_authority:
+  canonical_live_status: "trace/ACTIVE_WORK_REGISTRY.yaml (active_tasks[].status)"
+  immutable_task_status: "trace/tasks/<TASK>.md (historical after IN_PROGRESS)"
+  human_summary: "trace/STAR_MAP.md"
+  handoff_status: "handoff task.status point-in-time snapshot"
+  vocabulary_source: status_vocabulary
+
+status_vocabulary:
+  - PLANNED
+  - AUTHORIZED
+  - IN_PROGRESS
+  - BLOCKED
+  - PUSHED_FOR_REVIEW
+  - CHANGES_REQUIRED
+  - READY_FOR_PRODUCT_OWNER
+  - MERGED
+  - CLOSED
+
+ownership_rules:
+  writable_paths_exclusive: true
+  overlapping_write_requires_recorded_resolution: true
+  task_packet_immutable_after_in_progress: true
+  assigned_branch_only: true
+  main_merge_authority: product_owner_or_maintainer
+
+active_tasks: []
+
