@@ -9,6 +9,7 @@ Transport model:
 Binds to 127.0.0.1 only. Optional shared-secret via TRACE_INGEST_TOKEN.
 """
 import asyncio
+import hmac
 import json
 import logging
 import os
@@ -94,7 +95,9 @@ async def health() -> dict:
 
 @app.post("/api/telemetry/hook")
 async def ingest_hook(request: Request, x_trace_token: str = Header(default="")) -> dict:
-    if INGEST_TOKEN and x_trace_token != INGEST_TOKEN:
+    if INGEST_TOKEN and not hmac.compare_digest(
+        x_trace_token.encode("utf-8"), INGEST_TOKEN.encode("utf-8")
+    ):
         raise HTTPException(status_code=401, detail="bad ingest token")
     # Body is only a wake-up; the JSONL log is the source of truth.
     try:
