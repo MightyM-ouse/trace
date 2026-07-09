@@ -140,11 +140,18 @@ async def evidence() -> dict:
     for p in sorted(review_packages_dir().glob("*")):
         if p.name.lower() == "readme.md":
             continue
-        items.append({
+        entry = {
             "name": p.name,
             "is_dir": p.is_dir(),
             "size_bytes": p.stat().st_size if p.is_file() else None,
-        })
+        }
+        if p.is_dir():
+            entry["files"] = [
+                {"name": f.name, "size_bytes": f.stat().st_size}
+                for f in sorted(p.glob("*"))
+                if f.is_file()
+            ]
+        items.append(entry)
     return {"review_packages": items}
 
 

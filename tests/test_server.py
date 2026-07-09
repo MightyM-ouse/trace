@@ -130,3 +130,23 @@ def test_ingest_ignores_partial_trailing_line(tmp_path, monkeypatch):
     second = ingestmod.ingest_new()
     assert len(second) == 1
     assert dbmod.counters()["total_events"] == 2
+
+
+def test_evidence_lists_files_inside_review_packages(tmp_path, monkeypatch):
+    monkeypatch.setenv("TRACE_PROJECT_DIR", str(tmp_path))
+    pkg = tmp_path / "review-packages" / "TASK-A"
+    pkg.mkdir(parents=True)
+    (pkg / "ai_review.md").write_text("ok")
+    (pkg / "test_logs.txt").write_text("logs")
+
+    from fastapi.testclient import TestClient
+    from main import app
+
+    client = TestClient(app)
+    resp = client.get("/api/evidence")
+    assert resp.status_code == 200
+    pkgs = {item["name"]: item for item in resp.json()["review_packages"]}
+    assert "TASK-A" in pkgs
+    assert pkgs["TASK-A"]["is_dir"] is True
+    names = {f["name"] for f in pkgs["TASK-A"]["files"]}
+    assert {"ai_review.md", "test_logs.txt"} <= names
